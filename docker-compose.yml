@@ -1,0 +1,44 @@
+version: '3.7'
+networks:
+  dockernet:
+    name: '${APP_NAME}'
+services:
+  api:
+    build:
+      context: .
+      target: build
+      args:
+        buildcmd: npm run build
+    command: 'npm run start:debug'
+    container_name: '${APP_NAME}'
+    environment:
+      - 'NODE_ENV=${NODE_ENV}'
+    image: '${APP_NAME}:latest'
+    init: true
+    networks:
+      - dockernet
+    ports:
+      - '${APP_PORT}:3000'
+      - '${APP_PORT_DEBUG}:9229'
+    volumes:
+      - '.:/usr/src/app'
+      - /usr/src/app/node_modules
+    depends_on:
+      - db
+  db:
+    container_name: '${APP_NAME}-db'
+    image: 'postgres:alpine'
+    environment:
+      - 'POSTGRES_USER=${DB_USER}'
+      - 'POSTGRES_PASSWORD=${DB_PSWD}'
+      - 'POSTGRES_DB=${APP_NAME}'
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    networks:
+      - dockernet
+    ports:
+      - '${DB_CLIENT_PORT}:5432'
+    volumes:
+      - 'dockervolume:/var/lib/postgresql/data'
+volumes:
+  dockervolume:
+    name: '${APP_NAME}-db'
