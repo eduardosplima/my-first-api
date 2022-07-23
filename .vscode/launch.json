@@ -8,7 +8,6 @@
       "address": "0.0.0.0",
       "localRoot": "${workspaceFolder}",
       "port": "${input:envAPP_PORT_DEBUG}",
-      "protocol": "inspector",
       "remoteRoot": "/usr/src/app",
       "restart": true,
       "skipFiles": [
@@ -21,7 +20,6 @@
       "name": "Debug (jest)",
       "localRoot": "${workspaceFolder}",
       "port": "${input:envAPP_PORT_DEBUG}",
-      "protocol": "inspector",
       "skipFiles": [
         "<node_internals>/**"
       ]
