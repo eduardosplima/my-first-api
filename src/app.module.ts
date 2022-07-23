@@ -1,10 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
-import { AppController } from './app.controller';
 import { CoreModule } from './core/core.module';
-
-// import { AuthModule } from './auth/auth.module';
+import { TodosModule } from './todo/todos.module';
 
 @Module({
   imports: [
@@ -14,8 +12,7 @@ import { CoreModule } from './core/core.module';
     }),
     CoreModule.forRoot(),
 
-    // AuthModule,
+    TodosModule,
   ],
-  controllers: [AppController],
 })
 export class AppModule {}
