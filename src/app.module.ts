@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
 import { CoreModule } from './core/core.module';
-import { TodosModule } from './todo/todos.module';
+import { TodosModule } from './todos/todos.module';
 
 @Module({
   imports: [

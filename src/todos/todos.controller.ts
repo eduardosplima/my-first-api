@@ -13,9 +13,9 @@ import {
 } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 
-import { CreateTodoResponseDto } from '../dto/create-todo-response.dto';
-import { CreateTodoDto } from '../dto/create-todo.dto';
-import { TodoDto } from '../dto/todo.dto';
+import { CreateTodoResponseDto } from './dto/create-todo-response.dto';
+import { CreateTodoDto } from './dto/create-todo.dto';
+import { TodoDto } from './dto/todo.dto';
 import { TodosService } from './todos.service';
 
 @ApiTags('todos')

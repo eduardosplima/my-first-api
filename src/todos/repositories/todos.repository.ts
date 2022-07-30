@@ -3,7 +3,7 @@ import { Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { CreateTodoDto } from '../../dto/create-todo.dto';
+import { CreateTodoDto } from '../dto/create-todo.dto';
 import { Todo } from '../entities/todo.entity';
 
 @Injectable()

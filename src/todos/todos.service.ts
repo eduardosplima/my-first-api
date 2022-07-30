@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 
-import { CreateTodoResponseDto } from '../dto/create-todo-response.dto';
-import { CreateTodoDto } from '../dto/create-todo.dto';
-import { TodoDto } from '../dto/todo.dto';
+import { CreateTodoResponseDto } from './dto/create-todo-response.dto';
+import { CreateTodoDto } from './dto/create-todo.dto';
+import { TodoDto } from './dto/todo.dto';
 import { TodosRepository } from './repositories/todos.repository';
 
 @Injectable()
