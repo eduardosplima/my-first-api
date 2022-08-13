@@ -1,14 +1,8 @@
-import {
-  BadRequestException,
-  Body,
-  Controller,
-  HttpCode,
-  HttpStatus,
-  Post,
-} from '@nestjs/common';
+import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { ErrorResponseDto } from '../commom/dto/error-response.dto';
+import { CustomHttpException } from '../commom/exceptions/custom-http.exception';
 import { AuthService } from './auth.service';
 import { SigninResultDto } from './dto/signin-result.dto';
 import { SigninDto } from './dto/signin.dto';
@@ -36,7 +30,11 @@ export class AuthController {
         error instanceof LoginNotFoundException ||
         error instanceof InvalidPasswordException
       ) {
-        throw new BadRequestException('Usuário e/ou senha inválidos');
+        throw new CustomHttpException(
+          'Usuário e/ou senha inválidos',
+          HttpStatus.BAD_REQUEST,
+          error,
+        );
       }
 
       throw error;

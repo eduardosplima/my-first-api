@@ -37,7 +37,7 @@ async function bootstrap() {
 
   if (process.env.SWAGGER_PATH) {
     const builder = new DocumentBuilder()
-      // .addBearerAuth()
+      .addBearerAuth()
       .setTitle(process.env.APP_NAME);
     if (process.env.SWAGGER_SERVER) {
       builder.addServer(process.env.SWAGGER_SERVER);
