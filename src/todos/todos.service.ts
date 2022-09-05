@@ -9,12 +9,18 @@ import { TodosRepository } from './repositories/todos.repository';
 export class TodosService {
   constructor(private readonly todosRepository: TodosRepository) {}
 
-  async getTodos(): Promise<TodoDto[]> {
-    return this.todosRepository.getTodos();
+  async getTodos(user: number): Promise<TodoDto[]> {
+    return this.todosRepository.getTodos(user);
   }
 
-  async getTodo(id: number): Promise<TodoDto> {
-    return this.todosRepository.getTodo(id);
+  async getTodo(id: number, user: number): Promise<TodoDto> {
+    const todo = await this.todosRepository.getTodo(id);
+
+    if (todo.user === user) {
+      delete todo.user;
+      return todo;
+    }
+    return null;
   }
 
   async createTodo(
@@ -24,13 +30,14 @@ export class TodosService {
     return { id };
   }
 
-  async updateTodo(id: number, createTodoDto: CreateTodoDto): Promise<void> {
-    // TODO: Tratar id não encontrado
-    return this.todosRepository.updateTodo(id, createTodoDto);
+  async updateTodo(
+    todoDto: TodoDto,
+    createTodoDto: CreateTodoDto,
+  ): Promise<void> {
+    return this.todosRepository.updateTodo(todoDto, createTodoDto);
   }
 
-  async deleteTodo(id: number): Promise<void> {
-    // TODO: Tratar id não encontrado
-    return this.todosRepository.deleteTodo(id);
+  async deleteTodo(todoDto: TodoDto): Promise<void> {
+    return this.todosRepository.deleteTodo(todoDto.id);
   }
 }

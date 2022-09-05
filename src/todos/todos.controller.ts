@@ -15,6 +15,8 @@ import {
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { ReqUser } from '../commom/decorators/req-user.decorator';
+import { User } from '../users/entities/user.entity';
 import { CreateTodoResponseDto } from './dto/create-todo-response.dto';
 import { CreateTodoDto } from './dto/create-todo.dto';
 import { TodoDto } from './dto/todo.dto';
@@ -28,8 +30,8 @@ export class TodosController {
   constructor(private readonly todosService: TodosService) {}
 
   @Get()
-  async getTodos(): Promise<TodoDto[]> {
-    return this.todosService.getTodos();
+  async getTodos(@ReqUser() user: User): Promise<TodoDto[]> {
+    return this.todosService.getTodos(user.id);
   }
 
   @ApiResponse({
@@ -41,8 +43,11 @@ export class TodosController {
     description: 'Todo not found',
   })
   @Get(':id')
-  async getTodo(@Param('id', ParseIntPipe) id: number): Promise<TodoDto> {
-    const result = await this.todosService.getTodo(id);
+  async getTodo(
+    @Param('id', ParseIntPipe) id: number,
+    @ReqUser() user: User,
+  ): Promise<TodoDto> {
+    const result = await this.todosService.getTodo(id, user.id);
     if (result) return result;
 
     throw new NotFoundException('Todo not found');
@@ -55,8 +60,9 @@ export class TodosController {
   @Post()
   async createTodo(
     @Body() createTodoDto: CreateTodoDto,
+    @ReqUser() user: User,
   ): Promise<CreateTodoResponseDto> {
-    return this.todosService.createTodo(createTodoDto);
+    return this.todosService.createTodo({ ...createTodoDto, user: user.id });
   }
 
   @ApiResponse({
@@ -72,8 +78,17 @@ export class TodosController {
   async updateTodo(
     @Param('id', ParseIntPipe) id: number,
     @Body() createTodoDto: CreateTodoDto,
+    @ReqUser() user: User,
   ): Promise<void> {
-    await this.todosService.updateTodo(id, createTodoDto);
+    const todo = await this.todosService.getTodo(id, user.id);
+    if (!todo) {
+      throw new NotFoundException('Todo not found');
+    }
+
+    await this.todosService.updateTodo(todo, {
+      ...createTodoDto,
+      user: user.id,
+    });
   }
 
   @ApiResponse({
@@ -86,7 +101,15 @@ export class TodosController {
   })
   @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(':id')
-  async deleteTodo(@Param('id', ParseIntPipe) id: number): Promise<void> {
-    await this.todosService.deleteTodo(id);
+  async deleteTodo(
+    @Param('id', ParseIntPipe) id: number,
+    @ReqUser() user: User,
+  ): Promise<void> {
+    const todo = await this.todosService.getTodo(id, user.id);
+    if (!todo) {
+      throw new NotFoundException('Todo not found');
+    }
+
+    await this.todosService.deleteTodo(todo);
   }
 }

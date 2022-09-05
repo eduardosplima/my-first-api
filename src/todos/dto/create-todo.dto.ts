@@ -1,4 +1,6 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsEmpty, IsNotEmpty, IsString } from 'class-validator';
+
+import { ApiHideProperty } from '@nestjs/swagger';
 
 export class CreateTodoDto {
   @IsString()
@@ -8,4 +10,8 @@ export class CreateTodoDto {
   @IsString()
   @IsNotEmpty()
   content: string;
+
+  @ApiHideProperty()
+  @IsEmpty()
+  user: number;
 }
