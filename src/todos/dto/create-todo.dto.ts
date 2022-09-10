@@ -1,4 +1,12 @@
-import { IsEmpty, IsNotEmpty, IsString } from 'class-validator';
+import {
+  IsArray,
+  IsEmpty,
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+  IsPositive,
+  IsString,
+} from 'class-validator';
 
 import { ApiHideProperty } from '@nestjs/swagger';
 
@@ -14,4 +22,10 @@ export class CreateTodoDto {
   @ApiHideProperty()
   @IsEmpty()
   user: number;
+
+  @IsPositive({ each: true })
+  @IsInt({ each: true })
+  @IsArray()
+  @IsOptional()
+  attachments: number[];
 }

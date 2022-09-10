@@ -25,24 +25,18 @@ export class TodosRepository {
     return this.repository.findOne({ where: { id }, loadRelationIds: true });
   }
 
-  async createTodo(createTodoDto: CreateTodoDto): Promise<number> {
-    const todo = new Todo();
-    todo.title = createTodoDto.title;
-    todo.content = createTodoDto.content;
-    todo.user = createTodoDto.user;
+  async createTodo(todo: Todo): Promise<number> {
+    const result = await this.repository.save(todo);
 
-    const result = await this.repository.insert(todo);
-
-    return result.identifiers[0].id;
+    return result.id;
   }
 
   async updateTodo(
     todoDto: TodoDto,
     createTodoDto: CreateTodoDto,
   ): Promise<void> {
-    const todo = this.repository.merge(todoDto as Todo, createTodoDto);
-
-    await this.repository.save(todo);
+    // const todo = this.repository.merge(todoDto as Todo, createTodoDto);
+    // await this.repository.save(todo);
   }
 
   async deleteTodo(id: number): Promise<void> {

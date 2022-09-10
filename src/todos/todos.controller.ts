@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Delete,
+  ForbiddenException,
   Get,
   HttpCode,
   HttpStatus,
@@ -16,10 +17,12 @@ import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ReqUser } from '../commom/decorators/req-user.decorator';
+import { ErrorResponseDto } from '../commom/dto/error-response.dto';
 import { User } from '../users/entities/user.entity';
 import { CreateTodoResponseDto } from './dto/create-todo-response.dto';
 import { CreateTodoDto } from './dto/create-todo.dto';
 import { TodoDto } from './dto/todo.dto';
+import { AttachmentException } from './exceptions/attachment.exception';
 import { TodosService } from './todos.service';
 
 @ApiBearerAuth()
@@ -29,6 +32,10 @@ import { TodosService } from './todos.service';
 export class TodosController {
   constructor(private readonly todosService: TodosService) {}
 
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    type: ErrorResponseDto,
+  })
   @Get()
   async getTodos(@ReqUser() user: User): Promise<TodoDto[]> {
     return this.todosService.getTodos(user.id);
@@ -36,10 +43,16 @@ export class TodosController {
 
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
+    type: ErrorResponseDto,
     description: 'Invalid id',
   })
   @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    type: ErrorResponseDto,
+  })
+  @ApiResponse({
     status: HttpStatus.NOT_FOUND,
+    type: ErrorResponseDto,
     description: 'Todo not found',
   })
   @Get(':id')
@@ -55,22 +68,48 @@ export class TodosController {
 
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
+    type: ErrorResponseDto,
     description: 'Bad Request',
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    type: ErrorResponseDto,
   })
   @Post()
   async createTodo(
     @Body() createTodoDto: CreateTodoDto,
     @ReqUser() user: User,
   ): Promise<CreateTodoResponseDto> {
-    return this.todosService.createTodo({ ...createTodoDto, user: user.id });
+    let response: CreateTodoResponseDto;
+
+    try {
+      response = await this.todosService.createTodo({
+        ...createTodoDto,
+        user: user.id,
+      });
+    } catch (error) {
+      if (error instanceof AttachmentException) {
+        throw new ForbiddenException();
+      }
+
+      throw error;
+    }
+
+    return response;
   }
 
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
+    type: ErrorResponseDto,
     description: 'Bad Request',
   })
   @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    type: ErrorResponseDto,
+  })
+  @ApiResponse({
     status: HttpStatus.NOT_FOUND,
+    type: ErrorResponseDto,
     description: 'Todo not found',
   })
   @HttpCode(HttpStatus.NO_CONTENT)
@@ -93,10 +132,16 @@ export class TodosController {
 
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
+    type: ErrorResponseDto,
     description: 'Bad Request',
   })
   @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    type: ErrorResponseDto,
+  })
+  @ApiResponse({
     status: HttpStatus.NOT_FOUND,
+    type: ErrorResponseDto,
     description: 'Todo not found',
   })
   @HttpCode(HttpStatus.NO_CONTENT)

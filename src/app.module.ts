@@ -1,8 +1,10 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
+import { AttachmentsModule } from './attachments/attachments.module';
 import { AuthModule } from './auth/auth.module';
 import { CoreModule } from './core/core.module';
+import { DomainsModule } from './domains/domains.module';
 import { TodosModule } from './todos/todos.module';
 import { UsersModule } from './users/users.module';
 
@@ -14,7 +16,9 @@ import { UsersModule } from './users/users.module';
     }),
     CoreModule.forRoot(),
 
+    AttachmentsModule,
     AuthModule,
+    DomainsModule,
     TodosModule,
     UsersModule,
   ],
