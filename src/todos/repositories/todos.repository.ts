@@ -3,8 +3,6 @@ import { Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { CreateTodoDto } from '../dto/create-todo.dto';
-import { TodoDto } from '../dto/todo.dto';
 import { Todo } from '../entities/todo.entity';
 
 @Injectable()
@@ -25,18 +23,9 @@ export class TodosRepository {
     return this.repository.findOne({ where: { id }, loadRelationIds: true });
   }
 
-  async createTodo(todo: Todo): Promise<number> {
+  async saveTodo(todo: Todo): Promise<number> {
     const result = await this.repository.save(todo);
-
     return result.id;
-  }
-
-  async updateTodo(
-    todoDto: TodoDto,
-    createTodoDto: CreateTodoDto,
-  ): Promise<void> {
-    // const todo = this.repository.merge(todoDto as Todo, createTodoDto);
-    // await this.repository.save(todo);
   }
 
   async deleteTodo(id: number): Promise<void> {

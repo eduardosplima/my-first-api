@@ -25,7 +25,7 @@ export class Attachment {
   @JoinColumn()
   mimeType: MimeType | number;
 
-  @ManyToOne(() => Todo, { eager: false })
+  @ManyToOne(() => Todo, (todo) => todo.attachments, { eager: false })
   @JoinColumn()
   todo: Todo | number;
 

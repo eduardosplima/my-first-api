@@ -24,7 +24,7 @@
   },
   "dependencies": {
     "@fastify/helmet": "^9.1.0",
-    "@fastify/multipart": "^7.1.0",
+    "@fastify/multipart": "7.1.0",
     "@fastify/swagger": "^7.4.1",
     "@nestjs/common": "^9.0.0",
     "@nestjs/config": "^2.2.0",

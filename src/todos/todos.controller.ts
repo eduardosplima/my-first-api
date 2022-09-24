@@ -2,7 +2,6 @@ import {
   Body,
   Controller,
   Delete,
-  ForbiddenException,
   Get,
   HttpCode,
   HttpStatus,
@@ -18,6 +17,7 @@ import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ReqUser } from '../commom/decorators/req-user.decorator';
 import { ErrorResponseDto } from '../commom/dto/error-response.dto';
+import { CustomHttpException } from '../commom/exceptions/custom-http.exception';
 import { User } from '../users/entities/user.entity';
 import { CreateTodoResponseDto } from './dto/create-todo-response.dto';
 import { CreateTodoDto } from './dto/create-todo.dto';
@@ -89,7 +89,7 @@ export class TodosController {
       });
     } catch (error) {
       if (error instanceof AttachmentException) {
-        throw new ForbiddenException();
+        throw new CustomHttpException('Forbiden', HttpStatus.FORBIDDEN, error);
       }
 
       throw error;
@@ -124,10 +124,18 @@ export class TodosController {
       throw new NotFoundException('Todo not found');
     }
 
-    await this.todosService.updateTodo(todo, {
-      ...createTodoDto,
-      user: user.id,
-    });
+    try {
+      await this.todosService.updateTodo(todo, {
+        ...createTodoDto,
+        user: user.id,
+      });
+    } catch (error) {
+      if (error instanceof AttachmentException) {
+        throw new CustomHttpException('Forbiden', HttpStatus.FORBIDDEN, error);
+      }
+
+      throw error;
+    }
   }
 
   @ApiResponse({

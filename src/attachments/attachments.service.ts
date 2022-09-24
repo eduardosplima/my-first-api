@@ -36,6 +36,7 @@ export class AttachmentsService {
     return result.identifiers[0].id;
   }
 
+  // TODO: Garantir que todos os ids existam na base
   async getByIds(ids: number[]): Promise<Attachment[]> {
     return this.attachmentsRepository.find({
       where: { id: In(ids) },
