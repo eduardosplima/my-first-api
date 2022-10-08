@@ -33,5 +33,5 @@ export class Todo {
     eager: false,
   })
   @JoinColumn()
-  attachments: Attachment[] | number[];
+  attachments: Array<Attachment | number>;
 }

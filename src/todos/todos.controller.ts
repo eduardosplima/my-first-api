@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -10,6 +11,7 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -17,10 +19,11 @@ import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ReqUser } from '../commom/decorators/req-user.decorator';
 import { ErrorResponseDto } from '../commom/dto/error-response.dto';
-import { CustomHttpException } from '../commom/exceptions/custom-http.exception';
 import { User } from '../users/entities/user.entity';
 import { CreateTodoResponseDto } from './dto/create-todo-response.dto';
 import { CreateTodoDto } from './dto/create-todo.dto';
+import { GetTodosResultDto } from './dto/get-todos-result.dto';
+import { GetTodosDto } from './dto/get-todos.dto';
 import { TodoDto } from './dto/todo.dto';
 import { AttachmentException } from './exceptions/attachment.exception';
 import { TodosService } from './todos.service';
@@ -37,8 +40,11 @@ export class TodosController {
     type: ErrorResponseDto,
   })
   @Get()
-  async getTodos(@ReqUser() user: User): Promise<TodoDto[]> {
-    return this.todosService.getTodos(user.id);
+  async getTodos(
+    @Query() getTodosDto: GetTodosDto,
+    @ReqUser() user: User,
+  ): Promise<GetTodosResultDto> {
+    return this.todosService.getTodos(getTodosDto, user.id);
   }
 
   @ApiResponse({
@@ -89,7 +95,7 @@ export class TodosController {
       });
     } catch (error) {
       if (error instanceof AttachmentException) {
-        throw new CustomHttpException('Forbiden', HttpStatus.FORBIDDEN, error);
+        throw new BadRequestException(error.message);
       }
 
       throw error;
@@ -131,7 +137,7 @@ export class TodosController {
       });
     } catch (error) {
       if (error instanceof AttachmentException) {
-        throw new CustomHttpException('Forbiden', HttpStatus.FORBIDDEN, error);
+        throw new BadRequestException(error.message);
       }
 
       throw error;

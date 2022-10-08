@@ -36,12 +36,22 @@ export class AttachmentsService {
     return result.identifiers[0].id;
   }
 
-  // TODO: Garantir que todos os ids existam na base
-  async getByIds(ids: number[]): Promise<Attachment[]> {
-    return this.attachmentsRepository.find({
-      where: { id: In(ids) },
-      loadRelationIds: true,
+  async findById(id: number, user: User): Promise<Attachment> {
+    return this.attachmentsRepository.findOne({
+      where: { id, user },
+      relations: ['mimeType'],
     });
+  }
+
+  async getByIds(ids: number[]): Promise<Attachment[]> {
+    if (ids?.length > 0) {
+      return this.attachmentsRepository.find({
+        where: { id: In(ids) },
+        loadRelationIds: true,
+      });
+    }
+
+    return [];
   }
 
   // TODO: Expurgo de registros fantasmas
