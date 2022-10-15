@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { ScheduleModule } from '@nestjs/schedule';
 
 import { AttachmentsModule } from './attachments/attachments.module';
 import { AuthModule } from './auth/auth.module';
@@ -15,6 +16,7 @@ import { UsersModule } from './users/users.module';
       expandVariables: true,
     }),
     CoreModule.forRoot(),
+    ScheduleModule.forRoot(),
 
     AttachmentsModule,
     AuthModule,

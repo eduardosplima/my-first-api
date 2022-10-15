@@ -22,42 +22,30 @@ export class TodosService {
     getTodosDto: GetTodosDto,
     user: number,
   ): Promise<GetTodosResultDto> {
-    // let order: any;
-    // if (getTodosDto.pageSort) {
-    //   if (getTodosDto.pageSort === 'title') {
-    //     if (getTodosDto.pageOrder) {
-    //       order.title = getTodosDto.pageOrder;
-    //     } else {
-    //       order.title = 'ASC';
-    //     }
-    //   } else if (getTodosDto.pageSort === 'createdAt') {
-    //     if (getTodosDto.pageOrder) {
-    //       order.createdAt = getTodosDto.pageOrder;
-    //     } else {
-    //       order.createdAt = 'ASC';
-    //     }
-    //   } else {
-    //     throw new Error('Faz algo errado');
-    //   }
-    // } else if (getTodosDto.pageOrder) {
-    //   order.createdAt = getTodosDto.pageOrder;
-    // } else {
-    //   order.createdAt = 'ASC';
-    // }
-
-    const order = {
-      [getTodosDto.pageSort || 'createdAt']: getTodosDto.pageOrder || 'ASC',
-    };
+    const sort = getTodosDto.pageSort || 'createdAt';
+    const order = getTodosDto.pageOrder || 'DESC';
     const skip = getTodosDto.pageStart * getTodosDto.pageSize;
     const take = getTodosDto.pageSize;
 
-    const results = await this.todosRepository.getTodos(user);
+    const [content, totalRecords] =
+      await this.todosRepository.findAndCountTodos(
+        getTodosDto.title,
+        getTodosDto.content,
+        getTodosDto.startDate ? new Date(getTodosDto.startDate) : null,
+        getTodosDto.endDate ? new Date(getTodosDto.endDate) : null,
+        user,
+        sort as keyof Todo,
+        order,
+        skip,
+        take,
+      );
+
     return {
-      content: results as TodoDto[],
-      totalRecords: results.length,
-      totalPages: 1,
-      currentPage: 0,
-      pageSize: results.length,
+      content: content as TodoDto[],
+      totalRecords,
+      totalPages: Math.ceil(totalRecords / getTodosDto.pageSize),
+      currentPage: getTodosDto.pageStart,
+      pageSize: getTodosDto.pageSize,
     };
   }
 

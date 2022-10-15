@@ -1,7 +1,9 @@
+import { subDays } from 'date-fns';
 import { readFile } from 'fs/promises';
-import { In, Repository } from 'typeorm';
+import { In, IsNull, LessThanOrEqual, Repository } from 'typeorm';
 
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
+import { Cron, CronExpression } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { MultipartFileDto } from '../commom/dto/multipart-file.dto';
@@ -12,6 +14,8 @@ import { InvalidMimeTypeException } from './exceptions/invalid-mime-type.excepti
 
 @Injectable()
 export class AttachmentsService {
+  private readonly logger = new Logger(AttachmentsService.name);
+
   constructor(
     @InjectRepository(Attachment)
     private readonly attachmentsRepository: Repository<Attachment>,
@@ -54,5 +58,22 @@ export class AttachmentsService {
     return [];
   }
 
-  // TODO: Expurgo de registros fantasmas
+  @Cron(CronExpression.EVERY_DAY_AT_2AM)
+  removeUnusedAttachments() {
+    this.attachmentsRepository
+      .delete({
+        createdAt: LessThanOrEqual(subDays(new Date(), 1)),
+        todo: IsNull(),
+      })
+      .then((result) =>
+        this.logger.log(
+          `Rotina de expurgo executada, ${result.affected} anexos expurgados`,
+        ),
+      )
+      .catch((error) =>
+        this.logger.error(
+          `Rotina de expurgo executada com erro: ${error.message}`,
+        ),
+      );
+  }
 }
